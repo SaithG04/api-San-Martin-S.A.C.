@@ -21,4 +21,9 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
+
+    // Campos personales
+    private String firstName;
+    private String lastName;
+    private String phone;
 }

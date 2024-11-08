@@ -92,14 +92,27 @@ public class UserController {
             @RequestParam String currentPassword,
             @RequestParam String newPassword) {
 
-        logger.info("Intentando cambiar la contraseña para el usuario autenticado: {}", principal.getName());
-
         User user = userService.findByUsername(principal.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         userService.changePassword(user.getId(), currentPassword, newPassword);
-        logger.info("Contraseña actualizada exitosamente para el usuario: {}", user.getUsername());
-
         return new ResponseEntity<>("Password updated successfully", HttpStatus.OK);
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<User> getUserProfile(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = userService.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return ResponseEntity.ok(user);
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<User> updateUserProfile(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody User updatedProfile) {
+
+        User user = userService.updateUserProfile(userDetails.getUsername(), updatedProfile);
+        return ResponseEntity.ok(user);
     }
 }

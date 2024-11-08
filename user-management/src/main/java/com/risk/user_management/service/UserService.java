@@ -49,20 +49,30 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
-    // Actualizar la información de un usuario
+    // Actualizar información completa de un usuario (solo para administradores)
     public User updateUser(Long id, User updatedUser) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         user.setUsername(updatedUser.getUsername());
         user.setEmail(updatedUser.getEmail());
-
-        // Actualizar la contraseña solo si es diferente y se provee una nueva
-        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
-        }
-
         user.setRole(updatedUser.getRole());
+
+        return userRepository.save(user);
+    }
+
+
+
+    // Actualizar solo la información de perfil del usuario autenticado
+    public User updateUserProfile(String username, User updatedProfile) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Permitir solo la actualización de campos personales
+        user.setFirstName(updatedProfile.getFirstName());
+        user.setLastName(updatedProfile.getLastName());
+        user.setPhone(updatedProfile.getPhone());
+
         return userRepository.save(user);
     }
 
