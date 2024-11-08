@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.List;
+
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
@@ -33,6 +35,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(cors -> cors.configurationSource(request -> {
+                    var corsConfig = new org.springframework.web.cors.CorsConfiguration();
+                    corsConfig.setAllowedOrigins(List.of("http://localhost:4200"));
+                    corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    corsConfig.setAllowedHeaders(List.of("*"));
+                    corsConfig.setAllowCredentials(true);
+                    return corsConfig;
+                }))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/api/users/register", "/api/users/request-password-reset", "/api/users/reset-password").permitAll()
