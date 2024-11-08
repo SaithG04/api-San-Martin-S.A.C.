@@ -31,9 +31,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/register").permitAll()
                         .requestMatchers("/api/users").hasRole("ADMIN")
                         .requestMatchers("/api/users/{id}").hasRole("ADMIN")
+                        .requestMatchers("/api/users/{id}/assign-role").hasRole("ADMIN")
+                        .requestMatchers("/api/users/roles").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .userDetailsService(userDetailsService)  // Usar el servicio personalizado
+                .userDetailsService(userDetailsService)
                 .httpBasic(withDefaults());
 
         return http.build();

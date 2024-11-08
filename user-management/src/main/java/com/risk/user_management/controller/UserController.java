@@ -1,6 +1,7 @@
 package com.risk.user_management.controller;
 
 import com.risk.user_management.domain.User;
+import com.risk.user_management.domain.UserRole;
 import com.risk.user_management.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -42,5 +43,16 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/{id}/assign-role")
+    public ResponseEntity<User> assignRoleToUser(@PathVariable Long id, @RequestParam UserRole role) {
+        User updatedUser = userService.assignRoleToUser(id, role);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    }
+
+    @GetMapping("/roles")
+    public ResponseEntity<UserRole[]> getAllRoles() {
+        return new ResponseEntity<>(UserRole.values(), HttpStatus.OK);
     }
 }
