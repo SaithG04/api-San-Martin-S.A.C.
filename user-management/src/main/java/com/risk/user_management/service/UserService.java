@@ -49,6 +49,10 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
+    }
+
     // Actualizar información completa de un usuario (solo para administradores)
     public User updateUser(Long id, User updatedUser) {
         User user = userRepository.findById(id)
@@ -60,8 +64,6 @@ public class UserService {
 
         return userRepository.save(user);
     }
-
-
 
     // Actualizar solo la información de perfil del usuario autenticado
     public User updateUserProfile(String username, User updatedProfile) {

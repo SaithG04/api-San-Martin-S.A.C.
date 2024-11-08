@@ -5,6 +5,7 @@ import com.risk.user_management.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,10 +28,11 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        String prefixedRole = "ROLE_" + user.getRole();
-        logger.info("Cargando usuario: {} con rol: {}", user.getUsername(), prefixedRole);
+        if (!user.isActive()) {
+            throw new DisabledException("User account is deactivated");
+        }
 
-        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(prefixedRole));
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
 
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),

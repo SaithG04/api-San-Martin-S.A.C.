@@ -3,6 +3,7 @@ package com.risk.user_management.controller;
 import com.risk.user_management.domain.PasswordResetToken;
 import com.risk.user_management.domain.User;
 import com.risk.user_management.domain.UserRole;
+import com.risk.user_management.exception.UserNotFoundException;
 import com.risk.user_management.service.PasswordResetService;
 import com.risk.user_management.service.UserService;
 import io.swagger.annotations.Api;
@@ -76,7 +77,6 @@ public class UserController {
     @PostMapping("/request-password-reset")
     public ResponseEntity<String> requestPasswordReset(@RequestParam String email) {
         PasswordResetToken token = passwordResetService.createPasswordResetToken(email);
-        // Enviar el token al correo electrónico del usuario (Falta implementar)
         return new ResponseEntity<>("Password reset token sent to email", HttpStatus.OK);
     }
 
@@ -115,4 +115,17 @@ public class UserController {
         User user = userService.updateUserProfile(userDetails.getUsername(), updatedProfile);
         return ResponseEntity.ok(user);
     }
+
+    @PutMapping("/activate/{id}")
+    public ResponseEntity<String> activateUser(@PathVariable Long id, @RequestParam boolean isActive) {
+        User updatedUser = userService.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found"));
+
+        updatedUser.setActive(isActive);
+        userService.updateUser(id, updatedUser);
+
+        String status = isActive ? "activated" : "deactivated";
+        return ResponseEntity.ok("User " + status + " successfully");
+    }
+
 }
