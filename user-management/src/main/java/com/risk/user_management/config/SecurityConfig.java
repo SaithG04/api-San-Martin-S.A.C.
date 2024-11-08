@@ -4,6 +4,7 @@ import com.risk.user_management.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -28,10 +29,12 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/api/users/register").permitAll()
-                        .requestMatchers("/api/users").hasRole("ADMIN")
-                        .requestMatchers("/api/users/{id}").hasRole("ADMIN")
-                        .requestMatchers("/api/users/{id}/assign-role").hasRole("ADMIN")
+                        .requestMatchers("/api/users/register", "/api/users/request-password-reset", "/api/users/reset-password").permitAll()
+                        .requestMatchers("/api/users/me").authenticated()
+                        .requestMatchers("/api/users/change-password").authenticated()
+                        .requestMatchers("/api/users/update/{id}").hasRole("ADMIN")
+                        .requestMatchers("/api/users/delete/{id}").hasRole("ADMIN")
+                        .requestMatchers("/api/users/assign-role/{id}").hasRole("ADMIN")
                         .requestMatchers("/api/users/roles").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )

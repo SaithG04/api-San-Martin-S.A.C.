@@ -2,6 +2,7 @@ package com.risk.user_management.service;
 
 import com.risk.user_management.domain.User;
 import com.risk.user_management.domain.UserRole;
+import com.risk.user_management.exception.InvalidCurrentPasswordException;
 import com.risk.user_management.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -44,6 +45,10 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
     // Actualizar la información de un usuario
     public User updateUser(Long id, User updatedUser) {
         User user = userRepository.findById(id)
@@ -75,5 +80,17 @@ public class UserService {
 
         user.setRole(role);
         return userRepository.save(user);
+    }
+
+    public void changePassword(Long userId, String currentPassword, String newPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new InvalidCurrentPasswordException("Current password is incorrect");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 }
